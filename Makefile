@@ -27,11 +27,13 @@ idt.o: src/idt/idt.c
 
 interrupts.o: src/idt/interrupts.s
 	$(AS) --64 $< -o $@
+pic.o: src/idt/pic.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 kernel.o: src/main/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o linker.ld idt.o interrupts.o
+keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o linker.ld idt.o interrupts.o pic.o
 	$(LD) $(LDFLAGS) \
 		boot.o \
 		kernel.o \
@@ -40,6 +42,7 @@ keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o linker.ld idt.o interr
 		shell.o \
 		idt.o \
 		interrupts.o \
+		pic.o\
 		-o $@
 
 keplar.iso: keplar.bin grub.cfg

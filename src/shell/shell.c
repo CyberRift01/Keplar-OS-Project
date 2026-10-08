@@ -122,7 +122,7 @@ static void shell_execute(void)
 
     terminal_putchar('\n');
 
-    terminal_write("Keplar: command not found: ");
+    terminal_write("Keplar: command not found!");
     terminal_write(shell_buffer);
     terminal_putchar('\n');
 
@@ -135,8 +135,7 @@ void shell_init(void) {
     shell_reset_buffer();
 }
 
-void shell_run(void)
-{
+void shell_run(void) {
     terminal_prompt();
 
     for (;;) {
@@ -166,5 +165,6 @@ void shell_run(void)
         shell_length++;
 
         terminal_putchar(c);
+        
     }
 }
