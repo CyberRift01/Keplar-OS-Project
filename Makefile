@@ -37,8 +37,10 @@ kernel.o: src/main/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
 parser.o: src/shell/parser.c
 	$(CC) $(CFLAGS) -c $< -o $@
+acpi.o: src/main/acpi.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld
+keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o
 	$(LD) $(LDFLAGS) \
 		boot.o \
 		kernel.o \
@@ -50,6 +52,7 @@ keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interru
 		interrupts.o \
 		pic.o \
 		irq.o \
+		acpi.o\
 		-o $@
 
 keplar.iso: keplar.bin grub.cfg

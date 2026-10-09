@@ -25,6 +25,10 @@ header_end:
 _start:
     cli
 
+    # Preserve GRUB's Multiboot2 magic and information pointer.
+    mov %eax, multiboot_magic
+    mov %ebx, multiboot_info_addr
+
     mov $stack_top, %esp
 
     # PML4[0] -> PDPT
@@ -87,8 +91,12 @@ long_mode_start:
     # Set the 64-bit stack.
     mov $stack_top, %rsp
 
-    call kernel_main
+    # kernel_main(uint32_t magic, uint32_t mbi_addr)
+    # System V AMD64: first argument RDI, second argument RSI.
+    movl multiboot_magic(%rip), %edi
+    movl multiboot_info_addr(%rip), %esi
 
+    call kernel_main
 .hang:
     cli
     hlt
@@ -114,6 +122,12 @@ gdt64_pointer:
 
 
 .section .bss
+.align 4
+multiboot_magic:
+    .long 0
+
+multiboot_info_addr:
+    .long 0
 .align 4096
 
 # PML4
