@@ -23,4 +23,6 @@ struct idt_pointer {
 
 void idt_init(void);
 
+void idt_set_irq_gates(void);
+
 #endif
