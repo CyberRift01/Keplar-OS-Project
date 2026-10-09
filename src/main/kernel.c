@@ -6,13 +6,10 @@
 void kernel_main(void) {
 
     keplar_intro();
-    idt_init();
     pic_remap();
+    idt_init();
+    
 
     shell_init();
     shell_run();
-
-    for (;;) {
-        __asm__ volatile ("hlt");
-    }
 }
