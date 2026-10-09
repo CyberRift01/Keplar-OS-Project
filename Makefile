@@ -35,18 +35,21 @@ irq.o: src/idt/irq.c
 
 kernel.o: src/main/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
+parser.o: src/shell/parser.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
-keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o linker.ld idt.o interrupts.o pic.o irq.o
+keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld
 	$(LD) $(LDFLAGS) \
 		boot.o \
 		kernel.o \
 		terminal.o \
 		keyboard.o \
 		shell.o \
+		parser.o \
 		idt.o \
 		interrupts.o \
-		pic.o\
-		irq.o\
+		pic.o \
+		irq.o \
 		-o $@
 
 keplar.iso: keplar.bin grub.cfg
