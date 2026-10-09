@@ -4,10 +4,10 @@
 #include "pic.h"
 
 void kernel_main(void) {
-    idt_init();
-    pic_remap();
 
     keplar_intro();
+    idt_init();
+    pic_remap();
 
     shell_init();
     shell_run();
