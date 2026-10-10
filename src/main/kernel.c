@@ -8,11 +8,9 @@ void kernel_main(void)
 {
     keplar_intro();
     pic_remap();
-    idt_init();
+
     timer_init();
 
     shell_init();
     shell_run();
-
-
 }

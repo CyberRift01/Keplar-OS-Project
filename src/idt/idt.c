@@ -60,6 +60,7 @@ void idt_init(void) {
 
     idt_set_irq_gates();
 
+
     /*
      * Load the IDT.
      */

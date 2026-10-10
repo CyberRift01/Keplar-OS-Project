@@ -42,6 +42,9 @@ acpi.o: src/main/acpi.c
 
 timer.o: src/idt/timer.c
 	$(CC) $(CFLAGS) -c $< -o $@
+scroll.o: src/shell/scroll.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 
 keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o timer.o
