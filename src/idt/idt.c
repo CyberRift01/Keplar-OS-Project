@@ -37,6 +37,8 @@ static void idt_set_gate( uint8_t vector,uint64_t handler, uint16_t selector, ui
 }
 
 void idt_init(void) {
+    
+    // (void) idt_ptr;
     for (uint16_t i = 0; i < IDT_ENTRIES; i++) {
         idt[i].offset_low = 0;
         idt[i].selector = 0;
@@ -47,28 +49,10 @@ void idt_init(void) {
         idt[i].zero = 0;
     }
 
-    /* Install a basic fatal handler for CPU exceptions. */
-    for (uint8_t i = 0; i < 32; i++) {
-        idt_set_gate(i, (uint64_t)exception_handler, 0x08, 0x8E);
-    }
-
-    /* Install timer and keyboard IRQ gates. */
-    
-
-    idt_ptr.limit = sizeof(idt) - 1;
-    idt_ptr.base = (uint64_t)idt;
-
-    idt_set_irq_gates();
-
-
-    /*
-     * Load the IDT.
-     */
-    __asm__ volatile (
-        "lidt %0"
-        :
-        : "m"(idt_ptr)
-    );
+    // for (uint8_t i = 0; i < 32; i++) {
+    //     idt_set_gate(i, (uint64_t)exception_handler, 0x08, 0x8E);
+    // }
+    idt[0].type_attr = 0x8E;
 }
 
 void idt_set_irq_gates(void) {

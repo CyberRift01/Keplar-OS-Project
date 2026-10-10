@@ -106,22 +106,31 @@ static const shell_builtin_t shell_builtins[] = {
 */
 
 static void command_timer(int argc, char ** argv) {
+    (void)argc;
+    (void)argv;
     timer_init();
     terminal_write("Keplar: Timer Initiated!\n");
 }
 
 
 static void command_pic(int argc,char **argv) {
+    (void)argc;
+    (void)argv;
     pic_remap();
     terminal_write("Keplar: PIC Initiated!\n");
 }
 
 static void command_idt(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
     idt_init();
     terminal_write("Keplar: IDT initiated!\n");
 }
 
-static void command_exit(int agrc, char **argv) {
+static void command_exit(int argc, char **argv) {
+    (void)argc;
+    (void)argv;
+
     shell_status = 0;
     terminal_write("Sorry to let you Go\nYou just exited from the terminal!\n");
 }
