@@ -27,9 +27,17 @@
 # universal handler for every exception type.
 # --------------------------------------------------
 
+# --------------------------------------------------
+# exception handler
+# --------------------------------------------------
+
 exception_handler:
     cli
+
     lea rdi, [rip + exception_message]
+
+    # Align the stack before calling C.
+    and rsp, -16
     call terminal_write
 
 .exception_halt:

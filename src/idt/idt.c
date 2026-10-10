@@ -1,7 +1,17 @@
 #include <stdint.h>
 #include "idt.h"
 
+// All external functions should be placed here
+
+extern void exception_handler(void);
+
+// End of external
+
+// All defination should be placed here
+
 #define IDT_ENTRIES 256
+
+// End of defination
 
 static struct idt_entry idt[IDT_ENTRIES];
 static struct idt_pointer idt_ptr;
@@ -37,8 +47,18 @@ void idt_init(void) {
         idt[i].zero = 0;
     }
 
+    /* Install a basic fatal handler for CPU exceptions. */
+    for (uint8_t i = 0; i < 32; i++) {
+        idt_set_gate(i, (uint64_t)exception_handler, 0x08, 0x8E);
+    }
+
+    /* Install timer and keyboard IRQ gates. */
+    
+
     idt_ptr.limit = sizeof(idt) - 1;
-    idt_ptr.base = (uint64_t)&idt;
+    idt_ptr.base = (uint64_t)idt;
+
+    idt_set_irq_gates();
 
     /*
      * Load the IDT.
@@ -50,11 +70,8 @@ void idt_init(void) {
     );
 }
 
-void idt_set_irq_gates(void)
-{
-    extern void irq0_stub (void);
-    extern void irq1_stub (void);
+void idt_set_irq_gates(void) {
+    extern void irq0_stub(void);
 
-    idt_set_gate(0x20, (uint64_t) irq0_stub, 0x08, 0x8e);
-    idt_set_gate(0x21, (uint64_t) irq1_stub, 0x08, 0x8e);
+    idt_set_gate(0x20, (uint64_t)irq0_stub, 0x08, 0x8E);
 }
