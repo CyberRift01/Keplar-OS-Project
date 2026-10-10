@@ -42,3 +42,29 @@ void pic_send_eoi(uint8_t irq) {
 
     outb(PIC1_COMMAND, PIC_EOI);
 }
+
+void pic_unmask_irq(uint8_t irq)
+{
+    uint16_t port;
+    uint8_t value;
+
+    if (irq < 8) {
+        port = 0x21;
+    } else if (irq < 16) {
+        port = 0xA1;
+        irq -= 8;
+    } else {
+        return;
+    }
+
+    value = inb(port);
+    value &= (uint8_t)~(1u << irq);
+    outb(port, value);
+
+    /* If enabling a slave IRQ, also enable the master cascade. */
+    if (port == 0xA1) {
+        value = inb(0x21);
+        value &= (uint8_t)~(1u << 2);
+        outb(0x21, value);
+    }
+}
