@@ -69,8 +69,8 @@ void idt_init(void) {
         : "m"(idt_ptr)
     );
 }
-void idt_set_irq_gates(void)
-{
+
+void idt_set_irq_gates(void) {
     extern void irq0_stub(void);
 
     idt_set_gate(0x20, (uint64_t)irq0_stub, 0x08, 0x8E);
