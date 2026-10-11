@@ -5,6 +5,10 @@
 #include "timer.h"
 
 void kernel_main(void) {
+    pic_remap();
+    timer_init();
+    idt_init();
+    
     shell_init();
     shell_run();
     
