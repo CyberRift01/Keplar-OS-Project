@@ -5,6 +5,7 @@ LD = ld
 CFLAGS = -std=c11 -ffreestanding -O2 -Wall -Wextra \
          -m64 -mno-red-zone -fno-pie -fno-stack-protector \
          -Isrc/main -Isrc/idt -Isrc/terminal -Isrc/shell \
+		 -Isrc/utility\
 		 -mno-sse -mno-sse2 -mno-mmx -mno-avx -fno-tree-vectorize
 
 LDFLAGS = -T linker.ld -m elf_x86_64
@@ -45,10 +46,11 @@ timer.o: src/idt/timer.c
 	$(CC) $(CFLAGS) -c $< -o $@
 scroll.o: src/shell/scroll.c
 	$(CC) $(CFLAGS) -c $< -o $@
+status.o: src/utility/status.c
+	$(CC) $(CFLAGS) -c $< -o $@
 
 
-
-keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o timer.o
+keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o timer.o status.o
 	$(LD) $(LDFLAGS) \
 		boot.o \
 		kernel.o \
@@ -62,6 +64,7 @@ keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interru
 		irq.o \
 		acpi.o\
 		timer.o\
+		status.o\
 		-o $@
 
 keplar.iso: keplar.bin grub.cfg

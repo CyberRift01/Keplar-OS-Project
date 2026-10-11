@@ -274,10 +274,7 @@ static void shell_execute(void)
  * Shell lifecycle
  * -------------------------------------------------- */
 
-void shell_init(void)
-{
-    terminal_clear();
-    keplar_intro();
+void shell_init(void) {
     shell_reset_buffer();
 }
 

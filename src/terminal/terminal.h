@@ -9,5 +9,7 @@ void terminal_putchar(char c);
 void terminal_write(const char *string);
 void terminal_prompt(void);
 void keplar_intro(void);
+void cterminal_putchar(char c, uint8_t color);
+void cterminal_write(const char *string, uint8_t color);
 
 #endif

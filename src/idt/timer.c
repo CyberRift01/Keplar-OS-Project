@@ -3,6 +3,8 @@
 #include "io.h"
 #include "pic.h"
 #include "timer.h"
+#include "terminal.h"
+#include "status.h"
 
 extern volatile uint64_t timer_ticks;
 
@@ -23,6 +25,9 @@ void timer_init(void)
 
     /* Allow timer IRQ0 through the PIC. */
     pic_unmask_irq(0);
+    terminal_write("Enabling Timer:        ");
+    status_function(1);
+    terminal_putchar('\n');
 }
 
 uint64_t timer_get_ticks(void)

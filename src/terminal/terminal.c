@@ -79,3 +79,50 @@ void keplar_intro(void) {
     terminal_write("=============================\n");
     terminal_write("Welcome to Keplar!\n\n");
 }
+
+void cterminal_putchar(char c, uint8_t color) {
+
+    if (c == '\n') {
+        terminal_column = 0;
+        terminal_row++;
+
+        if (terminal_row >= VGA_HEIGHT)
+            terminal_row = 0;
+
+        return;
+    }
+
+    if (c == '\b') {
+        if (terminal_column > 0) {
+            terminal_column--;
+
+            VGA_MEMORY[
+                terminal_row * VGA_WIDTH + terminal_column
+            ] = ((uint16_t)color << 8) | ' ';
+        }
+
+        return;
+    }
+
+    VGA_MEMORY[
+        terminal_row * VGA_WIDTH + terminal_column
+    ] = ((uint16_t)color << 8) | (uint8_t)c;
+
+    terminal_column++;
+
+    if (terminal_column >= VGA_WIDTH) {
+        terminal_column = 0;
+        terminal_row++;
+    }
+
+    if (terminal_row >= VGA_HEIGHT)
+        terminal_row = 0;
+}
+
+
+void cterminal_write(const char *string, uint8_t color)
+{
+    for (uint64_t i = 0; string[i] != '\0'; i++) {
+        cterminal_putchar(string[i], color);
+    }
+}

@@ -2,6 +2,8 @@
 
 #include "pic.h"
 #include "io.h"
+#include "status.h"
+#include "terminal.h"
 
 #define PIC1_COMMAND  0x20
 #define PIC1_DATA     0x21
@@ -34,6 +36,11 @@ void pic_remap(void) {
 
     outb(PIC1_DATA, master_mask);
     outb(PIC2_DATA, slave_mask);
+
+    terminal_write("Enabling PIC:          ");
+    status_function(1);
+    terminal_putchar('\n');
+
 }
 
 void pic_send_eoi(uint8_t irq) {

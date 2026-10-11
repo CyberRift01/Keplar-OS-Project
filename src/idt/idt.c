@@ -1,6 +1,8 @@
-
 #include <stdint.h>
+
 #include "idt.h"
+#include "terminal.h"
+#include "status.h"
 
 #define IDT_ENTRIES 256
 
@@ -53,6 +55,9 @@ void idt_init(void)
         : "m"(idt_ptr)
         : "memory"
     );
+    terminal_write("Enabling PIC:          ");
+    status_function(1);
+    terminal_putchar('\n');
 }
 
 void idt_set_irq_gates(void)
