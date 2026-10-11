@@ -4,7 +4,8 @@ LD = ld
 
 CFLAGS = -std=c11 -ffreestanding -O2 -Wall -Wextra \
          -m64 -mno-red-zone -fno-pie -fno-stack-protector \
-         -Isrc/main -Isrc/idt -Isrc/terminal -Isrc/shell
+         -Isrc/main -Isrc/idt -Isrc/terminal -Isrc/shell \
+		 -mno-sse -mno-sse2 -mno-mmx -mno-avx -fno-tree-vectorize
 
 LDFLAGS = -T linker.ld -m elf_x86_64
 
@@ -42,6 +43,9 @@ acpi.o: src/main/acpi.c
 
 timer.o: src/idt/timer.c
 	$(CC) $(CFLAGS) -c $< -o $@
+scroll.o: src/shell/scroll.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
 
 
 keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o timer.o

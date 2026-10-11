@@ -4,15 +4,12 @@
 #include "pic.h"
 #include "timer.h"
 
-void kernel_main(void)
-{
-    keplar_intro();
+void kernel_main(void) {
     pic_remap();
-    idt_init();
     timer_init();
-
+    idt_init();
+    
     shell_init();
     shell_run();
-
-
+    
 }
