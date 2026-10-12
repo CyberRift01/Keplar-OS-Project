@@ -25,6 +25,8 @@ static void command_echo(int argc, char **argv);
 static void command_about(int argc, char **argv);
 static void command_version(int argc, char **argv);
 static void command_exit(int argc, char ** argv);
+static void command_uptime(int argc, char **argv);
+static void command_sleep(int argc, char **argv);
 
 typedef void (*shell_command_fn)(int argc, char **argv);
 
@@ -91,10 +93,12 @@ static const shell_builtin_t shell_builtins[] = {
     {"info", "show info about Keplar", command_about},
     {"exit", "exit the terminal", command_exit},
     {"quit", "exit the terminal", command_exit},
+    {"uptime", "no description rn", command_uptime},
     {"idt", "temporarily for idt", command_idt},
     {"reboot", "Broken IDT used as a restart button", command_idt},
     {"pic", "temporarily for pic", command_pic},
-    {"timer", "temporarily for timer", command_timer}
+    {"timer", "temporarily for timer", command_timer},
+    {"sleep", "sleeps for seconds", command_sleep}
 };
 
 #define SHELL_BUILTIN_COUNT \
@@ -170,6 +174,8 @@ static void command_echo(int argc, char **argv) {
     terminal_putchar('\n');
 }
 
+
+
 static void command_about(int argc, char **argv)
 {
     (void)argc;
@@ -189,6 +195,40 @@ static void command_version(int argc, char **argv)
     keplar_intro();
 }
 
+static void command_uptime(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+    uint64_t ticks = timer_get_ticks();
+
+    terminal_write("Timer ticks: ");
+    terminal_write_uint(ticks);
+
+    terminal_write("\nRunning for approximately ");
+    terminal_write_uint(ticks / 100);
+    terminal_write(" seconds\n");
+}
+
+static void command_sleep(int argc, char **argv)
+{
+    if (argc<2){
+        terminal_write("Sleeping for 5 seconds\n");
+        ctimer_sleep(5);
+    }
+    else
+    {
+        uint64_t time = keplar_atoi(argv[1]);
+        if (time == 0 || time > UINT64_MAX / 100) {
+            terminal_write("Invalid sleep duration.\n");
+            return;
+        }
+        terminal_write("Sleeping for ");
+        terminal_write_uint(time);
+        terminal_write(time == 1 ? " second...\n" : " seconds...\n");
+
+        ctimer_sleep(time);
+    }
+}
 
 /* --------------------------------------------------
  * Command dispatcher

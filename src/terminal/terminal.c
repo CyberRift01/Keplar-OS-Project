@@ -2,6 +2,66 @@
 
 #include "terminal.h"
 #include "status.h"
+#include "timer.h"
+
+
+/*
+ * UTILITY
+*/
+
+#include <stdint.h>
+
+uint64_t kernel_strlen(const char *str)
+{
+    int length = 0;
+    while (str[length] != '\0') {
+        length++;
+    }
+    
+    return length;
+}
+
+uint64_t keplar_atoi(const char *str)
+{
+    uint64_t result = 0;
+
+    if (str == 0 || str[0] == '\0')
+        return 0;
+
+    for (uint64_t i = 0; str[i] != '\0'; i++) {
+        if (str[i] < '0' || str[i] > '9')
+            return 0;
+
+        uint64_t digit = (uint64_t)(str[i] - '0');
+
+        if (result > (UINT64_MAX - digit) / 10)
+            return 0;
+
+        result = result * 10 + digit;
+    }
+
+    return result;
+}
+
+uint8_t keplar_cmp_str(const char *str1, const char *str2)
+{
+    uint64_t len= kernel_strlen(str2);
+    if (len!=kernel_strlen(str1))
+        return 0;
+    else
+    {
+        for (uint64_t i=0; i<len; i++)
+        {
+            if (str1[i]!=str2[i])
+                return 0;
+        }
+    }
+    return 1;
+}
+
+/*
+ * END OF UTILITY
+*/
 
 static volatile uint16_t *const VGA_MEMORY =
     (volatile uint16_t *)0xB8000;
@@ -130,4 +190,35 @@ void cterminal_write(const char *string, uint8_t color)
     for (uint64_t i = 0; string[i] != '\0'; i++) {
         cterminal_putchar(string[i], color);
     }
+}
+
+void terminal_write_uint(uint64_t value)
+{
+    char digits[20];
+    unsigned int i = 0;
+
+    if (value == 0) {
+        terminal_putchar('0');
+        return;
+    }
+
+    while (value > 0) {
+        digits[i++] = '0' + (value % 10);
+        value /= 10;
+    }
+
+    while (i > 0) {
+        terminal_putchar(digits[--i]);
+    }
+}
+
+uint8_t terminal_match_char_flag(const char *string, const char *flag)
+{
+    
+    if (!keplar_cmp_str(string,flag)){
+        cterminal_write("Invalid flag!", 0x04);
+        return 0;
+    }
+    else
+        return 1;
 }

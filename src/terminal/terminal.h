@@ -11,5 +11,10 @@ void terminal_prompt(void);
 void keplar_intro(void);
 void cterminal_putchar(char c, uint8_t color);
 void cterminal_write(const char *string, uint8_t color);
+void terminal_write_uint(uint64_t value);
+uint8_t terminal_match_char_flag(const char *string, const char *flag);
+uint64_t kernel_strlen(const char *str);
+uint64_t keplar_atoi(const char *str);
+uint8_t keplar_cmp_str(const char *str1, const char *str2);
 
 #endif

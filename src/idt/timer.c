@@ -34,3 +34,33 @@ uint64_t timer_get_ticks(void)
 {
     return timer_ticks;
 }
+
+void timer_sleep(uint64_t seconds)
+{
+    uint64_t start = timer_get_ticks();
+    uint64_t duration = seconds * 100;
+
+    while ((timer_get_ticks() - start) < duration) {
+        __asm__ volatile ("pause");
+    }
+}
+
+void ctimer_sleep(uint64_t seconds)
+{
+    uint64_t start = timer_get_ticks();
+
+    for (uint64_t i = 1; i <= seconds; i++) {
+        uint64_t target = i * 100;
+
+        while ((timer_get_ticks() - start) < target) {
+            __asm__ volatile ("pause");
+        }
+
+        terminal_write("Sleeping for ");
+
+        terminal_write_uint(i);
+        terminal_write(i == 1 ? " second...\n" : " seconds...\n");
+    }
+
+    terminal_write("Keplar back on business!\n");
+}
