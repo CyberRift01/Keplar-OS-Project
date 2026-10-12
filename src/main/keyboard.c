@@ -7,6 +7,9 @@
 #define QUEUE_SIZE 128
 #define QUEUE_MASK (QUEUE_SIZE - 1)
 
+// cancel_flag
+static volatile uint8_t cancel_requested;
+
 /* PS/2 Set 1: unshifted and shifted with caps characters. */
 static const char normal_map[KEY_COUNT] = {
     [0x01] = 27,
@@ -78,6 +81,11 @@ static void queue_character(char c)
     uint8_t head = queue_head;
     uint8_t next = (uint8_t)((head + 1) & QUEUE_MASK);
 
+    if (c == 3) {
+    cancel_requested = 1;
+    return;
+    }
+
     /* Leave one slot empty to distinguish full from empty. */
     if (next == queue_tail)
         return; /* Full: drop this character. */
@@ -86,8 +94,24 @@ static void queue_character(char c)
     queue_head = next;
 }
 
+
+void keyboard_clear_cancel(void)
+{
+    cancel_requested = 0;
+}
+
+int keyboard_take_cancel(void)
+{
+    if (!cancel_requested)
+        return 0;
+
+    cancel_requested = 0;
+    return 1;
+}
+
 void keyboard_init(void)
 {
+    cancel_requested = 0;
     for (unsigned int i = 0; i < 2; i++) {
         for (unsigned int j = 0; j < KEY_COUNT; j++)
             down[i][j] = 0;

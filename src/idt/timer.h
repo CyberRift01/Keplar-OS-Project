@@ -5,7 +5,7 @@
 
 void timer_init(void);
 uint64_t timer_get_ticks(void);
-void ctimer_sleep(uint64_t seconds);
-void timer_sleep(uint64_t seconds);
+uint8_t ctimer_sleep(uint64_t seconds);
+uint8_t timer_sleep(uint64_t seconds);
 
 #endif

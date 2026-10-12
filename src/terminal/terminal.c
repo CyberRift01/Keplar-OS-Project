@@ -222,3 +222,33 @@ uint8_t terminal_match_char_flag(const char *string, const char *flag)
     else
         return 1;
 }
+
+void terminal_backward_put_char(char c, uint8_t column)
+{
+    VGA_MEMORY[
+        terminal_row * VGA_WIDTH + VGA_WIDTH -column
+    ] = ((uint16_t)terminal_color << 8) | (uint8_t)c;
+}
+
+void cterminal_backward_put_char(char c, uint8_t column, uint8_t color)
+{
+    VGA_MEMORY[
+        terminal_row * VGA_WIDTH + VGA_WIDTH -column
+    ] = ((uint16_t)color << 8) | (uint8_t)c;
+}
+
+void terminal_backward_write(const char *string, uint8_t column)
+{
+    for (uint64_t i = 0; string[i] != '\0' || i+column<VGA_WIDTH; i++) {
+        terminal_backward_put_char(string[i],i+1+column);
+    }
+    terminal_column=VGA_WIDTH;
+}
+
+void cterminal_backward_write(const char *string, uint8_t column, uint8_t color)
+{
+    for (uint64_t i = 0; string[i] != '\0' || i+column<VGA_WIDTH; i++) {
+        cterminal_backward_put_char(string[i],i+1+column,color);
+    }
+    terminal_column=VGA_WIDTH;
+}

@@ -6,6 +6,21 @@
 
 volatile uint64_t timer_ticks = 0;
 
+
+void irq_dispatch_handler(uint64_t irq)
+{
+    /*
+     * IRQ2 is the slave PIC cascade line.
+     * IRQ2-IRQ15 do not have device handlers yet.
+     *
+     * Acknowledge the PIC so an unhandled IRQ
+     * does not remain in service indefinitely.
+     */
+    if (irq >= 2 && irq <= 15) {
+        pic_send_eoi((uint8_t)irq);
+    }
+}
+
 void irq0_handler(void)
 {
     timer_ticks++;

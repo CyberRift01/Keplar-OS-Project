@@ -6,14 +6,11 @@
 
 #define IDT_ENTRIES 256
 
-extern void exception_handler(void);
-extern void irq0_stub(void);
-extern void irq1_stub(void);
 
+extern void exception_handler(void);
 /*
  * IRQ0 to IRQ15
 */
-
 extern void irq0_stub(void);
 extern void irq1_stub(void);
 extern void irq2_stub(void);
@@ -30,7 +27,6 @@ extern void irq12_stub(void);
 extern void irq13_stub(void);
 extern void irq14_stub(void);
 extern void irq15_stub(void);
-
 /*
  * End Of IQRs
 */
@@ -87,19 +83,22 @@ void idt_init(void)
     terminal_putchar('\n');
 }
 
+
 void idt_set_irq_gates(void)
 {
-    idt_set_gate(
-        0x20,
-        (uint64_t)irq0_stub,
-        0x08,
-        0x8E
-    );
+    void (*const irq_stubs[16])(void) = {
+        irq0_stub,  irq1_stub,  irq2_stub,  irq3_stub,
+        irq4_stub,  irq5_stub,  irq6_stub,  irq7_stub,
+        irq8_stub,  irq9_stub,  irq10_stub, irq11_stub,
+        irq12_stub, irq13_stub, irq14_stub, irq15_stub
+    };
 
-    idt_set_gate(
-        0x21,
-        (uint64_t)irq1_stub,
-        0x08,
-        0x8E
-    );
+    for (uint16_t irq = 0; irq < 16; irq++) {
+        idt_set_gate(
+            (uint16_t)(0x20 + irq),
+            (uint64_t)irq_stubs[irq],
+            0x08,
+            0x8E
+        );
+    }
 }

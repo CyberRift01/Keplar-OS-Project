@@ -16,5 +16,9 @@ uint8_t terminal_match_char_flag(const char *string, const char *flag);
 uint64_t kernel_strlen(const char *str);
 uint64_t keplar_atoi(const char *str);
 uint8_t keplar_cmp_str(const char *str1, const char *str2);
+void terminal_backward_put_char(char c, uint8_t column);
+void cterminal_backward_put_char(char c, uint8_t column, uint8_t color);
+void terminal_backward_write(const char *string, uint8_t column);
+void cterminal_backward_write(const char *string, uint8_t column, uint8_t color);
 
 #endif

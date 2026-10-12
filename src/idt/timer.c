@@ -5,6 +5,7 @@
 #include "timer.h"
 #include "terminal.h"
 #include "status.h"
+#include "keyboard.h"
 
 extern volatile uint64_t timer_ticks;
 
@@ -35,17 +36,20 @@ uint64_t timer_get_ticks(void)
     return timer_ticks;
 }
 
-void timer_sleep(uint64_t seconds)
+uint8_t timer_sleep(uint64_t seconds)
 {
     uint64_t start = timer_get_ticks();
     uint64_t duration = seconds * 100;
 
     while ((timer_get_ticks() - start) < duration) {
+        if (keyboard_take_cancel())
+            return 1;
         __asm__ volatile ("pause");
     }
+    return 0;
 }
 
-void ctimer_sleep(uint64_t seconds)
+uint8_t ctimer_sleep(uint64_t seconds)
 {
     uint64_t start = timer_get_ticks();
 
@@ -53,6 +57,8 @@ void ctimer_sleep(uint64_t seconds)
         uint64_t target = i * 100;
 
         while ((timer_get_ticks() - start) < target) {
+            if (keyboard_take_cancel())
+                return 1;
             __asm__ volatile ("pause");
         }
 
@@ -63,4 +69,5 @@ void ctimer_sleep(uint64_t seconds)
     }
 
     terminal_write("Keplar back on business!\n");
+    return 0;
 }

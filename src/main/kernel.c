@@ -27,9 +27,9 @@ void kernel_main(void)
     __asm__ volatile ("cli" ::: "memory");
 
     keplar_intro();
-
-    pic_remap();
     idt_init();
+    pic_remap();
+
     idt_set_irq_gates();
 
     keyboard_init();

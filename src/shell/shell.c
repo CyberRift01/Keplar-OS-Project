@@ -211,22 +211,25 @@ static void command_uptime(int argc, char **argv)
 
 static void command_sleep(int argc, char **argv)
 {
-    if (argc<2){
-        terminal_write("Sleeping for 5 seconds\n");
-        ctimer_sleep(5);
-    }
-    else
-    {
-        uint64_t time = keplar_atoi(argv[1]);
+    uint64_t time = 5;
+
+    if (argc >= 2) {
+        time = keplar_atoi(argv[1]);
+
         if (time == 0 || time > UINT64_MAX / 100) {
             terminal_write("Invalid sleep duration.\n");
             return;
         }
-        terminal_write("Sleeping for ");
-        terminal_write_uint(time);
-        terminal_write(time == 1 ? " second...\n" : " seconds...\n");
+    }
 
-        ctimer_sleep(time);
+    keyboard_clear_cancel();
+
+    terminal_write("Sleeping for ");
+    terminal_write_uint(time);
+    terminal_write(time == 1 ? " second...\n" : " seconds...\n");
+
+    if (ctimer_sleep(time)) {
+        terminal_write("^C\n");
     }
 }
 
