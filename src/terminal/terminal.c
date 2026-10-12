@@ -1,6 +1,7 @@
 #include <stdint.h>
 
 #include "terminal.h"
+#include "status.h"
 
 static volatile uint16_t *const VGA_MEMORY =
     (volatile uint16_t *)0xB8000;
@@ -73,6 +74,10 @@ void terminal_prompt(void) {
 }
 
 void keplar_intro(void) {
+    terminal_write("Welcome to Keplar!\n");
+    terminal_write("Keplar is going to boot: ");
+    status_function(1);
+    terminal_write("\n\n");
     terminal_write("Hello from Keplar OS v.0.0.0 (Alpha)\n");
     terminal_write("=============================\n");
     terminal_write("Still in it's developing stage!\n");

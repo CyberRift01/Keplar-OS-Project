@@ -7,6 +7,33 @@
 #define IDT_ENTRIES 256
 
 extern void exception_handler(void);
+extern void irq0_stub(void);
+extern void irq1_stub(void);
+
+/*
+ * IRQ0 to IRQ15
+*/
+
+extern void irq0_stub(void);
+extern void irq1_stub(void);
+extern void irq2_stub(void);
+extern void irq3_stub(void);
+extern void irq4_stub(void);
+extern void irq5_stub(void);
+extern void irq6_stub(void);
+extern void irq7_stub(void);
+extern void irq8_stub(void);
+extern void irq9_stub(void);
+extern void irq10_stub(void);
+extern void irq11_stub(void);
+extern void irq12_stub(void);
+extern void irq13_stub(void);
+extern void irq14_stub(void);
+extern void irq15_stub(void);
+
+/*
+ * End Of IQRs
+*/
 
 static struct idt_entry idt[IDT_ENTRIES];
 static struct idt_pointer idt_ptr;
@@ -55,12 +82,24 @@ void idt_init(void)
         : "m"(idt_ptr)
         : "memory"
     );
-    terminal_write("Enabling PIC:          ");
+    terminal_write("Enabling IDT:            ");
     status_function(1);
     terminal_putchar('\n');
 }
 
 void idt_set_irq_gates(void)
 {
-    /* IRQ-specific gates will be added later. */
+    idt_set_gate(
+        0x20,
+        (uint64_t)irq0_stub,
+        0x08,
+        0x8E
+    );
+
+    idt_set_gate(
+        0x21,
+        (uint64_t)irq1_stub,
+        0x08,
+        0x8E
+    );
 }

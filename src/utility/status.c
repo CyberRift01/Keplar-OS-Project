@@ -2,8 +2,8 @@
 
 #include "terminal.h"
 
-void status_function(uint8_t staus) {
-    if (staus) {
+void status_function(uint8_t status) {
+    if (status) {
         terminal_write("[   ");
         cterminal_write("OK", 0x02);
         terminal_write("   ]");

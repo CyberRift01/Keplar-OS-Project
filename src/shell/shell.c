@@ -159,8 +159,7 @@ static void command_clear(int argc, char **argv)
     terminal_clear();
 }
 
-static void command_echo(int argc, char **argv)
-{
+static void command_echo(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         if (i > 1)
             terminal_putchar(' ');
@@ -278,14 +277,16 @@ void shell_init(void) {
     shell_reset_buffer();
 }
 
+
 void shell_run(void)
 {
     terminal_prompt();
 
     while (shell_status) {
-        char c = keyboard_getchar();
+        char c;
 
-        if (c == 0)
+        /* Read characters decoded by the keyboard driver. */
+        if (!keyboard_readchar(&c))
             continue;
 
         if (c == '\n' || c == '\r') {
@@ -299,7 +300,8 @@ void shell_run(void)
             continue;
         }
 
-        if (c < 32)
+        /* Ignore other control characters. */
+        if ((unsigned char)c < 32)
             continue;
 
         if (shell_length >= SHELL_BUFFER_SIZE - 1)

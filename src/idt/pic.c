@@ -37,7 +37,7 @@ void pic_remap(void) {
     outb(PIC1_DATA, master_mask);
     outb(PIC2_DATA, slave_mask);
 
-    terminal_write("Enabling PIC:          ");
+    terminal_write("Enabling PIC:            ");
     status_function(1);
     terminal_putchar('\n');
 

@@ -25,7 +25,7 @@ void timer_init(void)
 
     /* Allow timer IRQ0 through the PIC. */
     pic_unmask_irq(0);
-    terminal_write("Enabling Timer:        ");
+    terminal_write("Enabling Timer:          ");
     status_function(1);
     terminal_putchar('\n');
 }
