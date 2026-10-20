@@ -15,16 +15,11 @@ static uint8_t shell_status = (uint8_t) 1;
 /*
 AVALIALBE COMMANDS SHOULD BE REGISTER HERE
 */
-
-static void command_pic(int argc, char ** argv);
-static void command_timer(int argc, char ** argv);
-static void command_idt(int argc, char **agrc);
 static void command_help(int argc, char **argv);
 static void command_clear(int argc, char **argv);
 static void command_echo(int argc, char **argv);
 static void command_about(int argc, char **argv);
 static void command_version(int argc, char **argv);
-static void command_exit(int argc, char ** argv);
 static void command_uptime(int argc, char **argv);
 static void command_sleep(int argc, char **argv);
 
@@ -91,13 +86,7 @@ static const shell_builtin_t shell_builtins[] = {
     { "about",   "About Keplar",            command_about },
     { "version", "Show version information", command_version },
     {"info", "show info about Keplar", command_about},
-    {"exit", "exit the terminal", command_exit},
-    {"quit", "exit the terminal", command_exit},
     {"uptime", "no description rn", command_uptime},
-    {"idt", "temporarily for idt", command_idt},
-    {"reboot", "Broken IDT used as a restart button", command_idt},
-    {"pic", "temporarily for pic", command_pic},
-    {"timer", "temporarily for timer", command_timer},
     {"sleep", "sleeps for seconds", command_sleep}
 };
 
@@ -108,36 +97,6 @@ static const shell_builtin_t shell_builtins[] = {
  * Built-in commands
  * --------------------------------------------------
 */
-
-static void command_timer(int argc, char ** argv) {
-    (void)argc;
-    (void)argv;
-    timer_init();
-    terminal_write("Keplar: Timer Initiated!\n");
-}
-
-
-static void command_pic(int argc,char **argv) {
-    (void)argc;
-    (void)argv;
-    pic_remap();
-    terminal_write("Keplar: PIC Initiated!\n");
-}
-
-static void command_idt(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-    idt_init();
-    terminal_write("Keplar: IDT initiated!\n");
-}
-
-static void command_exit(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-
-    shell_status = 0;
-    terminal_write("Sorry to let you Go\nYou just exited from the terminal!\n");
-}
 
 static void command_help(int argc, char **argv)
 {
@@ -195,17 +154,20 @@ static void command_version(int argc, char **argv)
     keplar_intro();
 }
 
+
 static void command_uptime(int argc, char **argv)
 {
     (void)argc;
     (void)argv;
+
     uint64_t ticks = timer_get_ticks();
+    uint64_t seconds = timer_get_seconds();
 
     terminal_write("Timer ticks: ");
     terminal_write_uint(ticks);
 
     terminal_write("\nRunning for approximately ");
-    terminal_write_uint(ticks / 100);
+    terminal_write_uint(seconds);
     terminal_write(" seconds\n");
 }
 
@@ -356,3 +318,8 @@ void shell_run(void)
         terminal_putchar(c);
     }
 }
+
+// users_ugwdjx
+//  |-> username_tqykom
+//  |-> password_nfhgup
+// pg_users

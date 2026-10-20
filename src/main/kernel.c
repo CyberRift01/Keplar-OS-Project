@@ -41,8 +41,4 @@ void kernel_main(void)
     __asm__ volatile ("sti" ::: "memory");
 
     shell_run();
-
-    for (;;) {
-        __asm__ volatile ("cli; hlt" ::: "memory");
-    }
 }

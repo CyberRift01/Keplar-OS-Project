@@ -9,10 +9,12 @@
 
 extern volatile uint64_t timer_ticks;
 
-#define PIT_COMMAND 0x43
-#define PIT_CHANNEL0 0x40
-#define PIT_BASE_FREQUENCY 1193182u
-#define PIT_FREQUENCY 100u
+#define PIT_COMMAND          0x43
+#define PIT_CHANNEL0         0x40
+#define PIT_BASE_FREQUENCY   1193182ULL
+#define PIT_FREQUENCY        100ULL
+#define PIT_DIVISOR          (PIT_BASE_FREQUENCY / PIT_FREQUENCY)
+
 
 void timer_init(void)
 {
@@ -70,4 +72,14 @@ uint8_t ctimer_sleep(uint64_t seconds)
 
     terminal_write("Keplar back on business!\n");
     return 0;
+}
+
+
+uint64_t timer_get_seconds(void)
+{
+    const uint64_t ticks = timer_get_ticks();
+
+    return (ticks / PIT_BASE_FREQUENCY) * PIT_DIVISOR
+         + ((ticks % PIT_BASE_FREQUENCY) * PIT_DIVISOR)
+           / PIT_BASE_FREQUENCY;
 }

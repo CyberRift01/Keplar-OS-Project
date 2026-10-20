@@ -14,6 +14,7 @@ void status_function(uint8_t status) {
         terminal_backward_put_char(' ', 8);
         terminal_backward_put_char(' ', 9);
         terminal_backward_put_char('[', 10);
+        terminal_putchar('\n');
 
     }
     else

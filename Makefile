@@ -1,3 +1,4 @@
+
 CC = gcc
 AS = as
 LD = ld
@@ -5,10 +6,27 @@ LD = ld
 CFLAGS = -std=c11 -ffreestanding -O2 -Wall -Wextra \
          -m64 -mno-red-zone -fno-pie -fno-stack-protector \
          -Isrc/main -Isrc/idt -Isrc/terminal -Isrc/shell \
-		 -Isrc/utility\
-		 -mno-sse -mno-sse2 -mno-mmx -mno-avx -fno-tree-vectorize
+         -Isrc/utility \
+         -mno-sse -mno-sse2 -mno-mmx -mno-avx \
+         -fno-tree-vectorize
 
 LDFLAGS = -T linker.ld -m elf_x86_64
+
+OBJECTS = boot.o \
+          kernel.o \
+          terminal.o \
+          keyboard.o \
+          shell.o \
+          parser.o \
+          idt.o \
+          interrupts.o \
+          pic.o \
+          irq.o \
+          acpi.o \
+          timer.o \
+          status.o \
+
+.PHONY: all clean check
 
 all: keplar.iso
 
@@ -29,6 +47,7 @@ idt.o: src/idt/idt.c
 
 interrupts.o: src/idt/interrupts.s
 	$(AS) --64 $< -o $@
+
 pic.o: src/idt/pic.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
@@ -37,42 +56,31 @@ irq.o: src/idt/irq.c
 
 kernel.o: src/main/kernel.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
 parser.o: src/shell/parser.c
 	$(CC) $(CFLAGS) -c $< -o $@
+
 acpi.o: src/main/acpi.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 timer.o: src/idt/timer.c
 	$(CC) $(CFLAGS) -c $< -o $@
-scroll.o: src/shell/scroll.c
-	$(CC) $(CFLAGS) -c $< -o $@
+
 status.o: src/utility/status.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
-keplar.bin: boot.o kernel.o terminal.o keyboard.o shell.o parser.o idt.o interrupts.o pic.o irq.o linker.ld acpi.o timer.o status.o
-	$(LD) $(LDFLAGS) \
-		boot.o \
-		kernel.o \
-		terminal.o \
-		keyboard.o \
-		shell.o \
-		parser.o \
-		idt.o \
-		interrupts.o \
-		pic.o \
-		irq.o \
-		acpi.o\
-		timer.o\
-		status.o\
-		-o $@
+keplar.bin: $(OBJECTS) linker.ld
+	$(LD) $(LDFLAGS) $(OBJECTS) -o $@
 
 keplar.iso: keplar.bin grub.cfg
 	rm -rf iso
 	mkdir -p iso/boot/grub
 	cp keplar.bin iso/boot/
 	cp grub.cfg iso/boot/grub/
-	grub-mkrescue -o keplar.iso iso
+	grub-mkrescue -o $@ iso
+
+check: keplar.bin
+	grub-file --is-x86-multiboot2 keplar.bin
 
 clean:
 	rm -rf *.o *.bin *.iso iso

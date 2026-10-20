@@ -75,3 +75,19 @@ void pic_unmask_irq(uint8_t irq)
         outb(0x21, value);
     }
 }
+
+
+int pic_is_spurious_irq(uint8_t irq)
+{
+    if (irq == 7) {
+        outb(0x20, 0x0B); /* Read master ISR. */
+        return (inb(0x20) & 0x80) == 0;
+    }
+
+    if (irq == 15) {
+        outb(0xA0, 0x0B); /* Read slave ISR. */
+        return (inb(0xA0) & 0x80) == 0;
+    }
+
+    return 0;
+}
