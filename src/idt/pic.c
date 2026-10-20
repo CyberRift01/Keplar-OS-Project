@@ -2,6 +2,8 @@
 
 #include "pic.h"
 #include "io.h"
+#include "status.h"
+#include "terminal.h"
 
 #define PIC1_COMMAND  0x20
 #define PIC1_DATA     0x21
@@ -34,6 +36,11 @@ void pic_remap(void) {
 
     outb(PIC1_DATA, master_mask);
     outb(PIC2_DATA, slave_mask);
+
+    terminal_write("Enabling PIC:            ");
+    status_function(1);
+    terminal_putchar('\n');
+
 }
 
 void pic_send_eoi(uint8_t irq) {
@@ -67,4 +74,20 @@ void pic_unmask_irq(uint8_t irq)
         value &= (uint8_t)~(1u << 2);
         outb(0x21, value);
     }
+}
+
+
+int pic_is_spurious_irq(uint8_t irq)
+{
+    if (irq == 7) {
+        outb(0x20, 0x0B); /* Read master ISR. */
+        return (inb(0x20) & 0x80) == 0;
+    }
+
+    if (irq == 15) {
+        outb(0xA0, 0x0B); /* Read slave ISR. */
+        return (inb(0xA0) & 0x80) == 0;
+    }
+
+    return 0;
 }

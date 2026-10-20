@@ -6,5 +6,6 @@
 void pic_remap(void);
 void pic_send_eoi(uint8_t irq);
 void pic_unmask_irq(uint8_t irq);
+int pic_is_spurious_irq(uint8_t irq);
 
 #endif

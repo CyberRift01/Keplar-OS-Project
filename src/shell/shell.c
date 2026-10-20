@@ -15,16 +15,13 @@ static uint8_t shell_status = (uint8_t) 1;
 /*
 AVALIALBE COMMANDS SHOULD BE REGISTER HERE
 */
-
-static void command_pic(int argc, char ** argv);
-static void command_timer(int argc, char ** argv);
-static void command_idt(int argc, char **agrc);
 static void command_help(int argc, char **argv);
 static void command_clear(int argc, char **argv);
 static void command_echo(int argc, char **argv);
 static void command_about(int argc, char **argv);
 static void command_version(int argc, char **argv);
-static void command_exit(int argc, char ** argv);
+static void command_uptime(int argc, char **argv);
+static void command_sleep(int argc, char **argv);
 
 typedef void (*shell_command_fn)(int argc, char **argv);
 
@@ -89,12 +86,8 @@ static const shell_builtin_t shell_builtins[] = {
     { "about",   "About Keplar",            command_about },
     { "version", "Show version information", command_version },
     {"info", "show info about Keplar", command_about},
-    {"exit", "exit the terminal", command_exit},
-    {"quit", "exit the terminal", command_exit},
-    {"idt", "temporarily for idt", command_idt},
-    {"reboot", "Broken IDT used as a restart button", command_idt},
-    {"pic", "temporarily for pic", command_pic},
-    {"timer", "temporarily for timer", command_timer}
+    {"uptime", "no description rn", command_uptime},
+    {"sleep", "sleeps for seconds", command_sleep}
 };
 
 #define SHELL_BUILTIN_COUNT \
@@ -104,36 +97,6 @@ static const shell_builtin_t shell_builtins[] = {
  * Built-in commands
  * --------------------------------------------------
 */
-
-static void command_timer(int argc, char ** argv) {
-    (void)argc;
-    (void)argv;
-    timer_init();
-    terminal_write("Keplar: Timer Initiated!\n");
-}
-
-
-static void command_pic(int argc,char **argv) {
-    (void)argc;
-    (void)argv;
-    pic_remap();
-    terminal_write("Keplar: PIC Initiated!\n");
-}
-
-static void command_idt(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-    idt_init();
-    terminal_write("Keplar: IDT initiated!\n");
-}
-
-static void command_exit(int argc, char **argv) {
-    (void)argc;
-    (void)argv;
-
-    shell_status = 0;
-    terminal_write("Sorry to let you Go\nYou just exited from the terminal!\n");
-}
 
 static void command_help(int argc, char **argv)
 {
@@ -159,8 +122,7 @@ static void command_clear(int argc, char **argv)
     terminal_clear();
 }
 
-static void command_echo(int argc, char **argv)
-{
+static void command_echo(int argc, char **argv) {
     for (int i = 1; i < argc; i++) {
         if (i > 1)
             terminal_putchar(' ');
@@ -170,6 +132,8 @@ static void command_echo(int argc, char **argv)
 
     terminal_putchar('\n');
 }
+
+
 
 static void command_about(int argc, char **argv)
 {
@@ -190,6 +154,46 @@ static void command_version(int argc, char **argv)
     keplar_intro();
 }
 
+
+static void command_uptime(int argc, char **argv)
+{
+    (void)argc;
+    (void)argv;
+
+    uint64_t ticks = timer_get_ticks();
+    uint64_t seconds = timer_get_seconds();
+
+    terminal_write("Timer ticks: ");
+    terminal_write_uint(ticks);
+
+    terminal_write("\nRunning for approximately ");
+    terminal_write_uint(seconds);
+    terminal_write(" seconds\n");
+}
+
+static void command_sleep(int argc, char **argv)
+{
+    uint64_t time = 5;
+
+    if (argc >= 2) {
+        time = keplar_atoi(argv[1]);
+
+        if (time == 0 || time > UINT64_MAX / 100) {
+            terminal_write("Invalid sleep duration.\n");
+            return;
+        }
+    }
+
+    keyboard_clear_cancel();
+
+    terminal_write("Sleeping for ");
+    terminal_write_uint(time);
+    terminal_write(time == 1 ? " second...\n" : " seconds...\n");
+
+    if (ctimer_sleep(time)) {
+        terminal_write("^C\n");
+    }
+}
 
 /* --------------------------------------------------
  * Command dispatcher
@@ -274,21 +278,20 @@ static void shell_execute(void)
  * Shell lifecycle
  * -------------------------------------------------- */
 
-void shell_init(void)
-{
-    terminal_clear();
-    keplar_intro();
+void shell_init(void) {
     shell_reset_buffer();
 }
+
 
 void shell_run(void)
 {
     terminal_prompt();
 
     while (shell_status) {
-        char c = keyboard_getchar();
+        char c;
 
-        if (c == 0)
+        /* Read characters decoded by the keyboard driver. */
+        if (!keyboard_readchar(&c))
             continue;
 
         if (c == '\n' || c == '\r') {
@@ -302,7 +305,8 @@ void shell_run(void)
             continue;
         }
 
-        if (c < 32)
+        /* Ignore other control characters. */
+        if ((unsigned char)c < 32)
             continue;
 
         if (shell_length >= SHELL_BUFFER_SIZE - 1)
@@ -314,3 +318,8 @@ void shell_run(void)
         terminal_putchar(c);
     }
 }
+
+// users_ugwdjx
+//  |-> username_tqykom
+//  |-> password_nfhgup
+// pg_users

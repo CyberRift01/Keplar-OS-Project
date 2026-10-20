@@ -1,10 +1,35 @@
-
 #include <stdint.h>
+
 #include "idt.h"
+#include "terminal.h"
+#include "status.h"
 
 #define IDT_ENTRIES 256
 
+
 extern void exception_handler(void);
+/*
+ * IRQ0 to IRQ15
+*/
+extern void irq0_stub(void);
+extern void irq1_stub(void);
+extern void irq2_stub(void);
+extern void irq3_stub(void);
+extern void irq4_stub(void);
+extern void irq5_stub(void);
+extern void irq6_stub(void);
+extern void irq7_stub(void);
+extern void irq8_stub(void);
+extern void irq9_stub(void);
+extern void irq10_stub(void);
+extern void irq11_stub(void);
+extern void irq12_stub(void);
+extern void irq13_stub(void);
+extern void irq14_stub(void);
+extern void irq15_stub(void);
+/*
+ * End Of IQRs
+*/
 
 static struct idt_entry idt[IDT_ENTRIES];
 static struct idt_pointer idt_ptr;
@@ -53,9 +78,27 @@ void idt_init(void)
         : "m"(idt_ptr)
         : "memory"
     );
+    terminal_write("Enabling IDT:            ");
+    status_function(1);
+    terminal_putchar('\n');
 }
+
 
 void idt_set_irq_gates(void)
 {
-    /* IRQ-specific gates will be added later. */
+    void (*const irq_stubs[16])(void) = {
+        irq0_stub,  irq1_stub,  irq2_stub,  irq3_stub,
+        irq4_stub,  irq5_stub,  irq6_stub,  irq7_stub,
+        irq8_stub,  irq9_stub,  irq10_stub, irq11_stub,
+        irq12_stub, irq13_stub, irq14_stub, irq15_stub
+    };
+
+    for (uint16_t irq = 0; irq < 16; irq++) {
+        idt_set_gate(
+            (uint16_t)(0x20 + irq),
+            (uint64_t)irq_stubs[irq],
+            0x08,
+            0x8E
+        );
+    }
 }
